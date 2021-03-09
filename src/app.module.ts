@@ -1,6 +1,6 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -15,10 +15,15 @@ import configuration from './config/configuration';
     }),
     UsersModule,
     AuthModule,
-    MongooseModule.forRoot(configuration().database.mongoDB, {
-      useCreateIndex: true,
-      useNewUrlParser: true,
-      useFindAndModify: false,
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        uri: config.get('database.mongoDB'),
+        useCreateIndex: true,
+        useNewUrlParser: true,
+        useFindAndModify: false,
+      }),
     }),
   ],
   controllers: [AppController],
