@@ -11,7 +11,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = new this.userModel(createUserDto)
-    return user.save();
+    return this.userModel.findById(user.id).lean().exec();
   }
 
   async findAll(): Promise<User[]> {
